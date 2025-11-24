@@ -35,4 +35,4 @@ fn main() {
 
    
     println!("\nSUCCESS: All student details written to simple_student_data.txt");
-}
+} 
