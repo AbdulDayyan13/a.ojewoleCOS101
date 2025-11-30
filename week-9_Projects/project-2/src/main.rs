@@ -1,38 +1,60 @@
 use std::io::Write; 
+
 fn main() {
    
-    let names = ["Oluchi Mordi", "Adams Aliyu", "Shania Bolade", "Adekunle Gold", "Blanca Edemoh"];
-    let matric_numbers = ["ACC10211111", "ECO10110101", "CSC10328828", "EEE11020202", "MEE10202001"];
-    let departments = ["Accounting", "Economics", "Computer", "Electrical", "Mechanical"];
-    let levels = ["300", "100", "200", "200", "100"];
+    let students = vec![
+        ("Oluchi Mordi", "ACC10211111", "Accounting", 300),
+        ("Adams Aliyu", "ECO10110101", "Economics", 100),
+        ("Shania Bolade", "CSC10328828", "Computer", 200),
+        ("Adekunle Gold", "EEE11020202", "Electrical", 200),
+        ("Blanca Edemoh", "MEE10202001", "Mechanical", 100),
+    ];
 
-  
-    let mut file = std::fs::File::create("simple_student_data.txt")
-        .expect("Failed to create file");
-
-    let header = "Student Name | Matric. Number | Department | Level\n";
-    file.write_all(header.as_bytes()).expect("Write failed for header");
+    println!("\nPAU SMIS");
     
+    println!("{:<20} {:<15} {:<15} {:<5}", "Student Name", "Matric. Number", "Department", "Level");
+    println!("{:-<60}", "");
 
+    for student in &students {
+        println!(
+            "{:<20} {:<15} {:<15} {:<5}", 
+            student.0, 
+            student.1, 
+            student.2, 
+            student.3  
+        );
+    }
+    
+    
+    let mut file = match std::fs::File::create("pau_smis_output.csv") {
+        Ok(f) => f,
+        Err(e) => {
+            println!("Error: Could not create the file: {}", e);
+            return; 
+        }
+    };
 
-    for i in 0..names.len() {
-
-        let mut line = String::new();
-        line.push_str(names[i]);
-        line.push_str(" | ");
-        line.push_str(matric_numbers[i]);
-        line.push_str(" | ");
-        line.push_str(departments[i]);
-        line.push_str(" | ");
-        line.push_str(levels[i]);
-        line.push_str("\n"); 
-
-        file.write_all(line.as_bytes()).expect("Write failed for student line");
-
-        
-        println!("{}", line.trim()); 
+   
+    if let Err(e) = writeln!(file, "PAU SMIS,,,") {
+        println!("Error writing title: {}", e);
+        return;
+    }
+    
+    if let Err(e) = writeln!(file, "Student Name,Matric. Number,Department,Level") {
+        println!("Error writing headers: {}", e);
+        return;
     }
 
    
-    println!("\nSUCCESS: All student details written to simple_student_data.txt");
+    for student in &students {
+    
+        if let Err(e) = writeln!(file, "{},{},{},{}", 
+            student.0, student.1, student.2, student.3) {
+            println!("Error writing student data: {}", e);
+            return;
+        }
+    }
+
+    println!("\n Success! Data saved to 'pau_smis_output.csv'.");
+    println!("This file can be opened directly in a spreadsheet program to match the image format.");
 } 
